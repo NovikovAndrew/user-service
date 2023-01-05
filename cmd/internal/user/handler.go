@@ -3,8 +3,8 @@ package user
 import (
 	"fmt"
 	"net/http"
-	"rest-api/cmd/main/internal/handlers"
-	"rest-api/cmd/main/pkg/logging"
+	"rest-api/cmd/internal/handlers"
+	"rest-api/pkg/logging"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -15,10 +15,10 @@ const (
 )
 
 type handler struct {
-	logger logging.Logger
+	logger *logging.Logger
 }
 
-func NewHandler(logger logging.Logger) handlers.Handler {
+func NewHandler(logger *logging.Logger) handlers.Handler {
 	return &handler{
 		logger: logger,
 	}
