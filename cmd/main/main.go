@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"rest-api/cmd/internal/config"
 	"rest-api/cmd/internal/user"
-	"rest-api/cmd/internal/user/db"
 	"rest-api/pkg/client/mongodb"
 	"rest-api/pkg/logging"
 	"time"
@@ -43,21 +42,6 @@ func main() {
 		panic(err)
 	}
 
-	storage := db.NewStorage(mongoDBClient, cfg.MongoDB.Collection, logger)
-	u := user.User{
-		ID:           "",
-		Username:     "Test",
-		PasswordHash: "12345",
-		Email:        "test@example.com",
-	}
-	user1ID, err := storage.Create(context.Background(), u)
-
-	if err != nil {
-		panic(err)
-	}
-
-	logger.Info("USER CREATED", user1ID)
-
 	logger.Info("Create router")
 	router := httprouter.New()
 
@@ -75,15 +59,11 @@ func start(router *httprouter.Router, cfg *config.Config) {
 	var listenErr error
 
 	if cfg.Listen.Type == SOCKET {
-		// path/to/binary
-		// Dir{} Path/To
-		// TODO: set output directory vscode vscode
+		// TODO: set output directory vscode
 		appDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 		if err != nil {
 			logger.Fatal(err)
 		}
-
-		// appDir = "/Users/andreynovikov/Desktop/all-project/Go/artdev-go-advanced/rest-api/build/app.sock"
 
 		logger.Info("Create socket")
 		socketPath := path.Join(appDir, "app.sock")
