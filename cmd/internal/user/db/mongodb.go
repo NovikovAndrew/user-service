@@ -24,6 +24,21 @@ func NewStorage(database *mongo.Database, collectionName string, logger *logging
 	}
 }
 
+func (db *db) FindAll(ctx context.Context) ([]user.User, error) {
+	var users []user.User
+	result, err := db.collection.Find(ctx, bson.M{})
+
+	if err != nil {
+		return nil, fmt.Errorf("Fauler to find users: %v", err)
+	}
+
+	if err := result.All(ctx, &users); err != nil {
+		return nil, fmt.Errorf("Failed to deocde users, error: %v", err)
+	}
+
+	return users, nil
+}
+
 func (db *db) Create(ctx context.Context, user user.User) (string, error) {
 	db.logger.Debugf("Create user: %v", user)
 
@@ -92,7 +107,7 @@ func (db *db) Update(ctx context.Context, user user.User) error {
 	delete(updateUserObj, "_id")
 
 	update := bson.M{
-		"%set": updateUserObj,
+		"$set": updateUserObj,
 	}
 
 	result, err := db.collection.UpdateOne(ctx, filter, update)

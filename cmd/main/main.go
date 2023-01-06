@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"rest-api/cmd/internal/config"
 	"rest-api/cmd/internal/user"
+	"rest-api/cmd/internal/user/db"
 	"rest-api/pkg/client/mongodb"
 	"rest-api/pkg/logging"
 	"time"
@@ -28,6 +29,8 @@ func main() {
 	logger := logging.GetLogger()
 	cfg := config.GetConfig()
 
+	logger.Info("Create mongodb client")
+	// mongosh for connect to mongo and use userservice if not exist
 	mongoDBClient, err := mongodb.NewClient(
 		context.Background(),
 		cfg.MongoDB.Host,
@@ -41,6 +44,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	storage := db.NewStorage(mongoDBClient, cfg.MongoDB.Collection, logger)
 
 	logger.Info("Create router")
 	router := httprouter.New()
@@ -64,6 +69,8 @@ func start(router *httprouter.Router, cfg *config.Config) {
 		if err != nil {
 			logger.Fatal(err)
 		}
+
+		// appDir = "/Users/andreynovikov/Desktop/all-project/Go/rest-api/build/app.sock"
 
 		logger.Info("Create socket")
 		socketPath := path.Join(appDir, "app.sock")

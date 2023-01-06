@@ -18,7 +18,7 @@ func NewClient(ctx context.Context, host, port, username, password, database, au
 	}
 
 	if username == "" && password == "" {
-		mongoURI = fmt.Sprintf("mongodb:/%s:%s", host, port)
+		mongoURI = fmt.Sprintf("mongodb://%s:%s", host, port)
 	} else {
 		mongoURI = fmt.Sprintf("mongodb://%s:%s@%s:%s", username, password, host, port)
 		optinDB = options.Credential{
